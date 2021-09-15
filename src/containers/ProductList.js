@@ -1,7 +1,8 @@
 import React from 'react'
 import axios from 'axios'
 import { Button, Dimmer, Container, Icon, Image, Item, Label, Loader, Message, Segment } from 'semantic-ui-react'
-import { productListURL } from '../constants'
+import { productListURL, addToCartURL } from '../constants'
+import { authAxios } from '../utils'
 
 
 class ProductList extends React.Component {
@@ -30,6 +31,25 @@ class ProductList extends React.Component {
       })
     })
   }
+
+  handleAddToCart = slug => {
+    this.setState({loading: true});
+    authAxios
+    .post(addToCartURL, {slug})
+    .then(res => {
+      console.log(res.data)
+      this.setState({
+        loading: false
+      })
+    })
+    .catch(err => {
+      this.setState({ 
+        error: err,
+        loading: false 
+      })
+    })
+  }
+
   render() {
     const { data, error, loading } = this.state;
     return (
@@ -61,9 +81,15 @@ class ProductList extends React.Component {
                   </Item.Meta>
                   <Item.Description>{item.description}</Item.Description>
                   <Item.Extra>
-                  <Button primary floated='right' icon labelPosition='right'>
-                      Add to cart
-                      <Icon name='cart plus' />
+                  <Button 
+                    primary 
+                    floated='right' 
+                    icon 
+                    labelPosition='right' 
+                    onClick={() => this.handleAddToCart(item.slug)}
+                    >
+                    Add to cart
+                    <Icon name='cart plus' />
                   </Button>
                   {item.discount_price && <Label color={
                     item.label === 'primary' 
