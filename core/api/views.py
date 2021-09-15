@@ -1,7 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from django.utils import timezone
 
-from rest_framework.generics import ListAPIView, get_object_or_404
-from rest_framework.permissions import AllowAny
+from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
@@ -44,3 +46,16 @@ class AddToCartView(APIView):
                 user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
             return Response(status=HTTP_200_OK)
+
+
+class OrderDetailView(RetrieveAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            return order
+        except ObjectDoesNotExist:
+            raise Http404("You do not have an active order")
+            #return Response({"message": "You do not have an active order"}, status=HTTP_400_BAD_REQUEST)

@@ -1,6 +1,6 @@
 import { CART_START, CART_SUCCESS, CART_FAIL } from "./actionTypes";
-import { authAxios } from "./actionTypes";
-import { fetchCart } from '../../constants';
+import { authAxios } from "../../utils";
+import { orderSummaryURL, updateObject } from '../../constants';
 
 
 export const cartStart = () => {
@@ -12,7 +12,7 @@ export const cartStart = () => {
 export const cartSuccess = data => {
   return {
     type: CART_SUCCESS,
-    token: token
+    data
   };
 };
 
@@ -23,11 +23,11 @@ export const cartFail = error => {
   };
 };
 
-export const cartFetch = () => {
+export const fetchCart = () => {
     return dispatch => {
       dispatch(cartStart());
       authAxios
-        .post(fetchCart)
+        .get(orderSummaryURL)
         .then(res => {
           dispatch(cartSuccess(res.data));
         })
@@ -36,5 +36,3 @@ export const cartFetch = () => {
         });
     };
   };
-
-export default reducer;

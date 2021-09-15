@@ -58,4 +58,4 @@ class OrderSerializer(serializers.ModelSerializer):
         return OrderItemSerializer(obj.items.all(), many=True).data
 
     def get_total(self, obj):
-        return obj.get_total(
+        return obj.get_total()
