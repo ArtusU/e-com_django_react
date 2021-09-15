@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from core.models import Item
 
+
 class ItemSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     label = serializers.SerializerMethodField()
+
     class Meta:
         model = Item
         fields = (
