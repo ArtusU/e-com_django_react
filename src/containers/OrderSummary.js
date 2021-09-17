@@ -70,12 +70,32 @@ class OrderSummary extends React.Component {
                           {i}
                         </Table.Cell>
                         <Table.Cell>{orderItem.item}</Table.Cell>
-                        <Table.Cell>{orderItem.item.price}</Table.Cell>
-                        <Table.Cell>Cell</Table.Cell>
-                        <Table.Cell>Cell</Table.Cell>
+                        <Table.Cell>£{orderItem.item_obj.price}</Table.Cell>
+                        <Table.Cell>{ orderItem.quantity }</Table.Cell>
+                        <Table.Cell>
+                          {orderItem.item.discount_price && (
+                            <Label color="green" ribbon>
+                              ON DISCOUNT
+                            </Label>
+                          )}
+                          £{orderItem.final_price}
+                          <Icon
+                            name="trash"
+                            color="red"
+                            style={{ float: "right", cursor: "pointer" }}
+                          />
+                        </Table.Cell>
                       </Table.Row>
                     )
                   })}
+                  <Table.Row>
+                    <Table.Cell />
+                    <Table.Cell />
+                    <Table.Cell />
+                    <Table.Cell textAlign="right" colSpan="2">
+                      Order Total: £{data.total}
+                    </Table.Cell>
+                  </Table.Row>
                 
                 </Table.Body>
 
