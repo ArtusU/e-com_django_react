@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Header, Icon, Label, Menu, Table } from 'semantic-ui-react';
+import { Button, Container, Header, Icon, Label, Menu, Table } from 'semantic-ui-react';
 import { authAxios } from '../utils';
 import {
   orderSummaryURL
@@ -48,45 +48,47 @@ class OrderSummary extends React.Component {
     render() {
       const { data, error, loading } = this.state;
         return (
-            <Container>
-              <Header as='h3'>Order Summary</Header>
-                <Table celled>
-                    <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Header</Table.HeaderCell>
-                        <Table.HeaderCell>Header</Table.HeaderCell>
-                        <Table.HeaderCell>Header</Table.HeaderCell>
-                    </Table.Row>
-                    </Table.Header>
+          <Container>
+            <Header as='h3'>Order Summary</Header>
+            {data && (
+              <Table celled>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>Item #</Table.HeaderCell>
+                    <Table.HeaderCell>Item name</Table.HeaderCell>
+                    <Table.HeaderCell>Item price</Table.HeaderCell>
+                    <Table.HeaderCell>Item quantity</Table.HeaderCell>
+                    <Table.HeaderCell>Total item price</Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
 
-                    <Table.Body>
-                    <Table.Row>
+                <Table.Body>
+                  {data.order_items.map((orderItem, i) => {
+                    return (
+                      <Table.Row key={orderItem.id}>
+                        <Table.Cell>
+                          {i}
+                        </Table.Cell>
+                        <Table.Cell>{orderItem.item}</Table.Cell>
+                        <Table.Cell>{orderItem.item.price}</Table.Cell>
                         <Table.Cell>Cell</Table.Cell>
                         <Table.Cell>Cell</Table.Cell>
-                        <Table.Cell>Cell</Table.Cell>
-                    </Table.Row>
-                    </Table.Body>
+                      </Table.Row>
+                    )
+                  })}
+                
+                </Table.Body>
 
-                    <Table.Footer>
-                    <Table.Row>
-                        <Table.HeaderCell colSpan='3'>
-                        <Menu floated='right' pagination>
-                            <Menu.Item as='a' icon>
-                            <Icon name='chevron left' />
-                            </Menu.Item>
-                            <Menu.Item as='a'>1</Menu.Item>
-                            <Menu.Item as='a'>2</Menu.Item>
-                            <Menu.Item as='a'>3</Menu.Item>
-                            <Menu.Item as='a'>4</Menu.Item>
-                            <Menu.Item as='a' icon>
-                            <Icon name='chevron right' />
-                            </Menu.Item>
-                        </Menu>
-                        </Table.HeaderCell>
-                    </Table.Row>
-                    </Table.Footer>
-                </Table>
-            </Container>
+                <Table.Footer>
+                <Table.Row>
+                    <Table.HeaderCell colSpan='5' textAlign='right'>
+                    <Button color='yellow'>Checkout</Button>
+                    </Table.HeaderCell>
+                </Table.Row>
+                </Table.Footer>
+              </Table>
+            )}
+          </Container>
         )
     }
 }
