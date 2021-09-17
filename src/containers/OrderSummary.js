@@ -1,9 +1,52 @@
 import React from 'react';
-import { Container, Header, Icon, Label, Menu, Table } from 'semantic-ui-react'
+import { Container, Header, Icon, Label, Menu, Table } from 'semantic-ui-react';
+import { authAxios } from '../utils';
+import {
+  orderSummaryURL
+} from '../constants';
 
 
 class OrderSummary extends React.Component {
+  state = {
+    data: null,
+    error: null,
+    lading: false
+  };
+
+  componentDidMount() {
+    this.handleFetchOrder()
+  }
+
+  handleFetchOrder = () => {
+    this.setState({
+      loading: true
+    });
+    authAxios
+    .get(orderSummaryURL)
+    .then(res => {
+      this.setState({
+        data: res.data,
+        loading: false
+      });
+    })
+    .catch(err => {
+      if (err.response.status === 400) {
+        this.setState({
+          error: "You currently do not have an order.",
+          loading: false
+        });
+      } else {
+        this.setState({
+          error: err,
+          loading: false
+        });
+      }
+    });
+  };
+
+
     render() {
+      const { data, error, loading } = this.state;
         return (
             <Container>
               <Header as='h3'>Order Summary</Header>
