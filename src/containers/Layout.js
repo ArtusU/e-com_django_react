@@ -1,4 +1,4 @@
-import React from "react";
+ import React from "react";
 import {
   Container,
   Divider,
@@ -52,7 +52,7 @@ class CustomLayout extends React.Component {
                           {cart.order_items.map(order_item => {
                             return (
                               <Dropdown.Item key={order_item.id}>
-                                {order_item.quantity} x {order_item.item.title}
+                                {order_item.quantity} x {order_item.item}
                               </Dropdown.Item>
                             );
                           })}
@@ -106,8 +106,6 @@ class CustomLayout extends React.Component {
                 <List link inverted>
                   <List.Item as="a">Link One</List.Item>
                   <List.Item as="a">Link Two</List.Item>
-                  <List.Item as="a">Link Three</List.Item>
-                  <List.Item as="a">Link Four</List.Item>
                 </List>
               </Grid.Column>
               <Grid.Column width={3}>
@@ -115,8 +113,6 @@ class CustomLayout extends React.Component {
                 <List link inverted>
                   <List.Item as="a">Link One</List.Item>
                   <List.Item as="a">Link Two</List.Item>
-                  <List.Item as="a">Link Three</List.Item>
-                  <List.Item as="a">Link Four</List.Item>
                 </List>
               </Grid.Column>
               <Grid.Column width={3}>
@@ -124,8 +120,6 @@ class CustomLayout extends React.Component {
                 <List link inverted>
                   <List.Item as="a">Link One</List.Item>
                   <List.Item as="a">Link Two</List.Item>
-                  <List.Item as="a">Link Three</List.Item>
-                  <List.Item as="a">Link Four</List.Item>
                 </List>
               </Grid.Column>
               <Grid.Column width={7}>

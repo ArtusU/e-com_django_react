@@ -1,6 +1,6 @@
 import { CART_START, CART_SUCCESS, CART_FAIL } from "./actionTypes";
 import { authAxios } from "../../utils";
-import { orderSummaryURL, updateObject } from '../../constants';
+import { orderSummaryURL } from '../../constants';
 
 
 export const cartStart = () => {
