@@ -36,19 +36,28 @@ class CheckoutForm extends Component {
   submit = ev => {
     ev.preventDefault();
     this.setState({ loading: true });
-
-    let { token } = this.props.stripe.createToken();
-    authAxios
-      .post('checkoutURL', {
-        stripeToken: token.id
-      })
-      .then(res => {
-        this.setState({ loading: false, success: true });
-      })
-      .catch(err => {
-        this.setState({ loading: false, error: err });
+    if (this.props.stripe) {
+      this.props.stripe.createToken().then(result => {
+        if (result.error) {
+          this.setState({ error: result.error.message, loading: false });
+        } else {
+          this.setState({ error: null });
+          authAxios
+            .post(checkoutURL, {
+              stripeToken: result.token.id
+            })
+            .then(res => {
+              this.setState({ loading: false, success: true });
+            })
+            .catch(err => {
+              this.setState({ loading: false, error: err });
+            });
+        }
       });
-    };
+    } else {
+      console.log("Stripe is not loaded");
+    }
+  };
 
 
   render() {
