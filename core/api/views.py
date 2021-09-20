@@ -8,8 +8,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
-from core.models import Item, Order, OrderItem
+from core.models import Address, Item, Order, OrderItem, Payment, UserProfile
 from .serializers import ItemSerializer, OrderSerializer
+
+import stripe 
 
 
 class ItemListView(ListAPIView):
