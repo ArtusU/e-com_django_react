@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Container, Header, Icon, Label, Menu, Table } from 'semantic-ui-react';
+import { Button, Container, Header, Icon, Label, Menu, Table, Message, Segment, Dimmer, Loader, Image } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { authAxios } from '../utils';
 import {
@@ -31,7 +31,7 @@ class OrderSummary extends React.Component {
       });
     })
     .catch(err => {
-      if (err.response.status === 400) {
+      if (err.response.status === 404) {
         this.setState({
           error: "You currently do not have an order.",
           loading: false
@@ -51,6 +51,22 @@ class OrderSummary extends React.Component {
         return (
           <Container>
             <Header as='h3'>Order Summary</Header>
+            {error && (
+              <Message
+                error
+                header="There was an error"
+                content={JSON.stringify(error)}
+              />
+            )}
+            {loading && (
+              <Segment>
+                <Dimmer active inverted>
+                  <Loader inverted>Loading</Loader>
+                </Dimmer>
+
+                <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
+              </Segment>
+            )}
             {data && (
               <Table celled>
                 <Table.Header>
