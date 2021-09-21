@@ -22,7 +22,7 @@ import {
 } from "semantic-ui-react";
 import { Link, withRouter } from "react-router-dom";
 import { authAxios } from "../utils";
-import { checkoutURL, orderSummaryURL } from "../constants";
+import { checkoutURL, orderSummaryURL, addCouponURL } from "../constants";
 
 
 class OrderPreview extends Component {
@@ -130,7 +130,8 @@ class OrderPreview extends Component {
                 <Item.Content>
                   <Item.Header>
                     Order Total: £{data.total}
-                  </Item.Header>,
+                  </Item.Header>
+                  {data.coupon && <Label color='yellow' style={{ marginLeft: '10px'}}>Current coupon: £{data.coupon.amount} OFF </Label>}
                 </Item.Content>
               </Item>
             </Item.Group>
@@ -142,6 +143,66 @@ class OrderPreview extends Component {
   };
 };
 
+class CouponForm extends Component {
+  state = {
+    loading: false,
+    error: null,
+    code: ''
+  };
+
+  handleAddCoupon = e => {
+    e.preventDefault();
+    this.setState({ loading: true })
+    const {code} = this.state;
+    authAxios.post(addCouponURL, {code})
+    .then(res => {
+      this.setState({loading: false})
+    }).catch(err => {
+      this.setState({error: err, loading: false})
+    })
+  }
+
+  handleChange = e => {
+    this.setState({
+      code: e.target.value
+    })
+  }
+  render () {
+    const { code, error, loading } = this.state;
+    return (
+      <React.Fragment>
+        {error && (
+          <Message
+            error
+            header="There was an error"
+            content={JSON.stringify(error)}
+          />
+        )}
+        {loading && (
+          <Segment>
+            <Dimmer active inverted>
+              <Loader inverted>Loading</Loader>
+            </Dimmer>
+
+            <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
+          </Segment>
+        )}
+      
+        <Form onSubmit={this.handleAddCoupon}>
+          <Form.Field>
+            <label>Coupon code</label>
+            <input
+              placeholder="Enter a coupon.."
+              value={code}
+              onChange={this.handleChange}
+            />
+          </Form.Field>
+          <Button type="submit">Submit</Button>
+        </Form>
+      </React.Fragment> 
+    );
+  }
+}
 
 class CheckoutForm extends Component {
   state = {
@@ -200,6 +261,10 @@ class CheckoutForm extends Component {
         )}
 
         <OrderPreview />
+
+        <Divider />
+
+        <CouponForm />
 
         <Divider />
 

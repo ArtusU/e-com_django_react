@@ -157,7 +157,7 @@ class PaymentView(APIView):
 
         except Exception as e:
             # send an email to ourselves
-            return Response({"message": "A serious error occurred. We have been notifed."}, status=HTTP_400_BAD_REQUEST)
+            return Response({"message": "A serious error occurred. We have been notified."}, status=HTTP_400_BAD_REQUEST)
 
         return Response({"message": "Invalid data received"}, status=HTTP_400_BAD_REQUEST)
 
