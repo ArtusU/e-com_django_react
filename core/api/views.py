@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from core.models import Address, Item, Order, OrderItem, Payment, UserProfile, Coupon
-from .serializers import ItemSerializer, OrderSerializer
+from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer
 
 import stripe
 
