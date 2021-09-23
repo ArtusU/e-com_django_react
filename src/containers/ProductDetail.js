@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import axios from 'axios';
 import { connect } from 'react-redux';
 
-import { Button, Card, Dimmer, Form, Grid, Container, Icon, Image, Item, Label, Loader, Message, Segment, Select, Divider } from 'semantic-ui-react'
+import { Button, Card, Dimmer, Form, Grid, Header, Container, Icon, Image, Item, Label, Loader, Message, Segment, Select, Divider } from 'semantic-ui-react'
 import { productDetailURL, addToCartURL } from '../constants'
 import { authAxios } from '../utils'
 import { fetchCart } from '../store/actions/cart'
@@ -64,59 +64,78 @@ class ProductDetail extends React.Component {
   }
 
   render() {
-    const { data, error, loading } = this.state;
+    const { data, error, formData, formVisible, loading } = this.state;
     const item = data;
     return (
       <Container>
         {error && (
           <Message
-          error
-          header='There was some errors with your submission'
-          content={JSON.stringify(error)}
-        />
+            error
+            header="There was some errors with your submission"
+            content={JSON.stringify(error)}
+          />
         )}
         {loading && (
           <Segment>
-          <Dimmer active inverted>
-            <Loader inverted>Loading</Loader>
-          </Dimmer>
-    
-          <Image src='/images/wireframe/short-paragraph.png' />
-        </Segment>
+            <Dimmer active inverted>
+              <Loader inverted>Loading</Loader>
+            </Dimmer>
+            <Image src="/images/wireframe/short-paragraph.png" />
+          </Segment>
         )}
-        <Item.Group divided>
-            return <Item key={item.id}>
-            <Item.Image src={item.image} />
-            <Item.Content>
-                <Item.Header as='a'>{item.title}</Item.Header>
-                <Item.Meta>
-                <span className='cinema'>{item.category}</span>
-                </Item.Meta>
-                <Item.Description>{item.description}</Item.Description>
-                <Item.Extra>
-                <Button 
-                  primary 
-                  floated='right' 
-                  icon 
-                  labelPosition='right' 
-                  onClick={() => this.handleAddToCart(item.slug)}
-                  >
-                  Add to cart
-                  <Icon name='cart plus' />
-                </Button>
-                {item.discount_price && <Label color={
-                  item.label === 'primary' 
-                  ? 'blue' 
-                  : item.label === 'secondary' 
-                  ? 'green' : 'olive'
-                  }>{item.label}</Label>}
-                </Item.Extra>
-            </Item.Content>
-            </Item>
-        </Item.Group>
+        <Grid columns={2}>
+          <Grid.Row>
+            <Grid.Column>
+              <Card
+                fluid
+                image={item.image}
+                header={item.title}
+                meta={
+                  <React.Fragment>
+                    {item.category}
+                    {item.discount_price && (
+                      <Label
+                        color={
+                          item.label === "primary"
+                            ? "blue"
+                            : item.label === "secondary"
+                            ? "green"
+                            : "olive"
+                        }
+                      >
+                        {item.label}
+                      </Label>
+                    )}
+                  </React.Fragment>
+                }
+                description={item.description}
+                extra={
+                  <React.Fragment>
+                    <Button
+                      fluid
+                      color="yellow"
+                      floated="right"
+                      icon
+                      labelPosition="right"
+                      onClick={this.handleToggleForm}
+                    >
+                      Add to cart
+                      <Icon name="cart plus" />
+                    </Button>
+                  </React.Fragment>
+                }
+              />
+            </Grid.Column>
+            <Grid.Column>
+              <Header as="h2">Try different variations</Header>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Container>
     );
   }
+
+
 }
 
 
