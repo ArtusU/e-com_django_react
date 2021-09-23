@@ -128,6 +128,31 @@ class ProductDetail extends React.Component {
             </Grid.Column>
             <Grid.Column>
               <Header as="h2">Try different variations</Header>
+              {data.variations &&
+                data.variations.map(v => {
+                  return (
+                    <React.Fragment key={v.id}>
+                      <Header as="h3">{v.name}</Header>
+                      <Item.Group divided>
+                        {v.item_variations.map(iv => {
+                          return (
+                            <Item key={iv.id}>
+                              {iv.attachment && (
+                                <Item.Image
+                                  size="tiny"
+                                  src={`http://127.0.0.1:8000${iv.attachment}`}
+                                />
+                              )}
+                              <Item.Content verticalAlign="middle">
+                                {iv.value}
+                              </Item.Content>
+                            </Item>
+                          );
+                        })}
+                      </Item.Group>
+                    </React.Fragment>
+                  );
+                })}
             </Grid.Column>
           </Grid.Row>
         </Grid>
