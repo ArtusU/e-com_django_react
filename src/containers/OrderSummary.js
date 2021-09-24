@@ -86,8 +86,8 @@ class OrderSummary extends React.Component {
                         <Table.Cell>
                           {i}
                         </Table.Cell>
-                        <Table.Cell>{orderItem.item}</Table.Cell>
-                        <Table.Cell>£{orderItem.item_obj.price}</Table.Cell>
+                        <Table.Cell>{orderItem.item.title}</Table.Cell>
+                        <Table.Cell>£{orderItem.item.price}</Table.Cell>
                         <Table.Cell>{ orderItem.quantity }</Table.Cell>
                         <Table.Cell>
                           {orderItem.item.discount_price && (
