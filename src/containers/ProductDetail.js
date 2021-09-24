@@ -14,12 +14,20 @@ class ProductDetail extends React.Component {
   state = {
     loading: false,
     error: null,
+    formVisible: false,
     data: []
   }
 
   componentDidMount() {
     this.handleFetchItem();
     
+  }
+
+  handleToggleForm = () => {
+    const {formVisible} = this.state;
+    this.setState({
+      formVisible: !formVisible
+    })
   }
 
   handleFetchItem = () => {
@@ -61,6 +69,12 @@ class ProductDetail extends React.Component {
         loading: false 
       })
     })
+  }
+
+  handleChange = (e, {name, value}) => {
+    console.log(name)
+    console.log(value)
+
   }
 
   render() {
@@ -125,6 +139,36 @@ class ProductDetail extends React.Component {
                   </React.Fragment>
                 }
               />
+              {formVisible && (
+                <React.Fragment>
+                <Divider />
+                  <Form onSubmit={() => this.handleAddToCart(item.slug)}>
+                    {data.variations.map(v => {
+                      const name = v.name.toLowerCase();
+                      return (
+                        <Form.Field key={v.id}>
+                          <Select
+                            name={name}
+                            onChange={this.handleChange}
+                            placeholder={`Select a ${name}`}
+                            fluid
+                            selection
+                            options={v.item_variations.map(item => {
+                              return {
+                                key: item.id,
+                                text: item.value,
+                                value: item.id
+                              };
+                            })}
+                            // value={formData[name]}
+                          />
+                        </Form.Field>
+                      );
+                    })}
+                    <Form.Button primary>Add</Form.Button>
+                  </Form>
+                </React.Fragment>
+              )}
             </Grid.Column>
             <Grid.Column>
               <Header as="h2">Try different variations</Header>

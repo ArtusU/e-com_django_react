@@ -84,7 +84,7 @@ class ProductList extends React.Component {
                   </Item.Meta>
                   <Item.Description>{item.description}</Item.Description>
                   <Item.Extra>
-                  <Button 
+                  {/* <Button 
                     primary 
                     floated='right' 
                     icon 
@@ -93,7 +93,7 @@ class ProductList extends React.Component {
                     >
                     Add to cart
                     <Icon name='cart plus' />
-                  </Button>
+                  </Button> */}
                   {item.discount_price && <Label color={
                     item.label === 'primary' 
                     ? 'blue' 
