@@ -38,13 +38,13 @@ const OrderPreview = props => {
               <Item key={i}>
                 <Item.Image 
                 size='tiny' 
-                src={`http://127.0.0.1:8000${orderItem.item_obj.image}`}
+                src={`http://127.0.0.1:8000${orderItem.item.image}`}
                 />
                 <Item.Content verticalAlign='middle'>
                   <Item.Header 
                     as='a'
                     >
-                    {orderItem.quantity} x {orderItem.item_obj.title}
+                    {orderItem.quantity} x {orderItem.item.title}
                   </Item.Header>
                   <Item.Extra>
                     <Label>
@@ -130,10 +130,9 @@ class CheckoutForm extends Component {
     authAxios
       .get(orderSummaryURL)
       .then(res => {
-        console.log(res.data)
         this.setState({ data: res.data, loading: false });
       })
-      .catch(err => {
+      .catch(err => { 
         if (err.response.status === 404) {
           this.props.history.push("/products");
         } else {
