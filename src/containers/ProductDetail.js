@@ -15,7 +15,8 @@ class ProductDetail extends React.Component {
     loading: false,
     error: null,
     formVisible: false,
-    data: []
+    data: [],
+    formData: {}
   }
 
   componentDidMount() {
@@ -53,10 +54,18 @@ class ProductDetail extends React.Component {
     })
   }
 
+  handleFormatData = formData => {
+    return Object.keys(formData).map(key => {
+      return formData[key];
+    })
+  }
+
   handleAddToCart = slug => {
     this.setState({loading: true});
+    const { formData } = this.state;
+    const variations = this.handleFormatData(formData);
     authAxios
-    .post(addToCartURL, {slug})
+    .post(addToCartURL, { slug, variations })
     .then(res => {
       this.props.fetchCart();
       this.setState({
@@ -72,6 +81,12 @@ class ProductDetail extends React.Component {
   }
 
   handleChange = (e, {name, value}) => {
+    const {formData} = this.state;
+    const updatedFormData = {
+      ...formData,
+      [name]:value
+    };
+    this.setState({formData: updatedFormData})
     console.log(name)
     console.log(value)
 
@@ -160,7 +175,7 @@ class ProductDetail extends React.Component {
                                 value: item.id
                               };
                             })}
-                            // value={formData[name]}
+                            value={formData[name]}
                           />
                         </Form.Field>
                       );
