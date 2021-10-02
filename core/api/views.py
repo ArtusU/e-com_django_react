@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from core.models import Address, Item, Order, OrderItem, Payment, UserProfile, Coupon, Variation
-from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer
+from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer, AddressSerializer
 
 import stripe
 
@@ -202,3 +202,11 @@ class AddCouponView(APIView):
         order.coupon = coupon
         order.save()
         return Response(status=HTTP_200_OK)
+
+
+class AddressListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = AddressSerializer
+    
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
