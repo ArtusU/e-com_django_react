@@ -187,10 +187,12 @@ class ItemDetailSerializer(serializers.ModelSerializer):
 
 class AddressSerializer(serializers.ModelSerializer):
     country = CountryField()
+    
     class Meta:
         model = Address
         fields = (
             'id',
+            'user',
             'street_address',
             'apartment_address',
             'country',

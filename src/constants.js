@@ -14,3 +14,4 @@ export const addCouponURL = `${endpoint}/add-coupon/`;
 export const addressListURL = `${endpoint}/addresses/`;
 export const addressCreateURL = `${endpoint}/addresses/create`;
 export const countryListURL = `${endpoint}/countries`;
+export const userIDURL = `${endpoint}/user-id`;

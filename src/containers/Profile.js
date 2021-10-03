@@ -18,7 +18,7 @@ import {
   Select,
   Table
 } from 'semantic-ui-react';
-import { addressListURL, addressCreateURL, countryListURL } from '../constants';
+import { addressListURL, addressCreateURL, countryListURL, userIDURL } from '../constants';
 import { authAxios } from '../utils';
 
 
@@ -38,12 +38,16 @@ class Profile extends React.Component {
     loading: false,
     addresses: [],
     countries: [],
-    formData: { default: false }
+    formData: { default: false },
+    saving: false,
+    success: false,
+    userID: null
   }
 
   componentDidMount() {
     this.handleFetchAddresses();
     this.handleFetchCountries();
+    this.handleFetchUserID();
   }
 
   handleItemClick = name => this.setState({ activeItem: name })
@@ -57,6 +61,18 @@ class Profile extends React.Component {
         value: k
       };
     });
+  };
+
+  handleFetchUserID = () => {
+    authAxios
+      .get(userIDURL)
+      .then(res => {
+        console.log(res.data)
+        this.setState({ userID: res.data.userID });
+      })
+      .catch(err => {
+        this.setState({ error: err });
+      });
   };
 
   handleFetchCountries = () => {
@@ -114,14 +130,30 @@ class Profile extends React.Component {
   };
 
   handleCreateAddress = e => {
+    this.setState({ saving: true })
     e.preventDefault();
-    const {formData} = this.state;
-    console.log(formData)
-  }
+    const { activeItem, formData, userID } = this.state;
+    authAxios
+      .post(addressCreateURL, {
+        ...formData,
+        user: userID,
+        address_type: activeItem === "billingAddress" ? "B" : "S"
+      })
+      .then(res => {
+        this.setState({
+          saving: false,
+          success: true,
+        });
+        this.props.callback();
+      })
+      .catch(err => {
+        this.setState({ error: err });
+      });
+  };
 
 
   render() {
-    const { activeItem, error, loading, addresses, countries } = this.state;
+    const { activeItem, error, loading, addresses, countries, saving, success } = this.state;
 
     return (
       <Grid container columns={2} divided>
@@ -175,7 +207,7 @@ class Profile extends React.Component {
             <Divider />
             {
               activeItem === 'billingAddress' ? (
-              <Form onSubmit={this.handleCreateAddress}>
+              <Form onSubmit={this.handleCreateAddress} success={success}>
                 <Form.Input
                   required
                   name="street_address"
@@ -211,7 +243,10 @@ class Profile extends React.Component {
                   label="Make this the default address?"
                   onChange={this.handleToggleDefault}
                 />
-                <Form.Button>
+                {success && (
+                  <Message success header="Success!" content="Your address was saved" />
+                )}
+                <Form.Button disabled={saving} loading={saving} primary>
                   Save
                 </Form.Button>
               </Form>
