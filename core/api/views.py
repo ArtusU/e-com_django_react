@@ -4,7 +4,9 @@ from django.conf import settings
 from django.http import Http404
 from django.utils import timezone
 
-from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
+from django_countries import countries
+
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -204,9 +206,22 @@ class AddCouponView(APIView):
         return Response(status=HTTP_200_OK)
 
 
+class CountryListView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response(countries, status=HTTP_200_OK)
+
+
 class AddressListView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = AddressSerializer
     
     def get_queryset(self):
         return Address.objects.filter(user=self.request.user)
+
+
+class AddressCreateView(CreateAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = AddressSerializer
+    queryset = Address.objects.all()
+
+

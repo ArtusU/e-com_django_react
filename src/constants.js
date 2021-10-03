@@ -12,3 +12,5 @@ export const orderSummaryURL = `${endpoint}/order-summary/`;
 export const checkoutURL = `${endpoint}/checkout/`;
 export const addCouponURL = `${endpoint}/add-coupon/`;
 export const addressListURL = `${endpoint}/addresses/`;
+export const addressCreateURL = `${endpoint}/addresses/create`;
+export const countryListURL = `${endpoint}/countries`;

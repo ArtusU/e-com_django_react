@@ -6,12 +6,16 @@ from .views import (
     OrderDetailView,
     PaymentView,
     AddCouponView,
-    AddressListView
+    CountryListView,
+    AddressListView,
+    AddressCreateView
 )
 
 
 urlpatterns = [
+    path('countries/', CountryListView.as_view(), name='country-list'),
     path('addresses/', AddressListView.as_view(), name='addresses-list'),
+    path('addresses/create', AddressCreateView.as_view(), name='address-create'),
     path('products/', ItemListView.as_view(), name='product-list'),
     path('products/<pk>/', ItemDetailView.as_view(), name='product-detail'),
     path('add-to-cart/', AddToCartView.as_view(), name='add-to-cart'),

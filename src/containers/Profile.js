@@ -18,7 +18,7 @@ import {
   Select,
   Table
 } from 'semantic-ui-react';
-import { addressListURL } from '../constants';
+import { addressListURL, addressCreateURL, countryListURL } from '../constants';
 import { authAxios } from '../utils';
 
 
@@ -36,14 +36,38 @@ class Profile extends React.Component {
     activeItem: 'billingAddress',
     error: null,
     loading: false,
-    addresses: []
+    addresses: [],
+    countries: [],
+    formData: { default: false }
   }
 
   componentDidMount() {
     this.handleFetchAddresses();
+    this.handleFetchCountries();
   }
 
   handleItemClick = name => this.setState({ activeItem: name })
+
+  handleFormatCountries = countries => {
+    const keys = Object.keys(countries);
+    return keys.map(k => {
+      return {
+        key: k,
+        text: countries[k],
+        value: k
+      };
+    });
+  };
+
+  handleFetchCountries = () => {
+    authAxios.get(countryListURL)
+    .then(res => {
+      this.setState({ countries: this.handleFormatCountries(res.data) });
+    })
+    .catch(err => {
+      this.setState({error: err });
+    });
+  };
 
   handleFetchAddresses = () => {
     this.setState({ loading: true })
@@ -56,9 +80,48 @@ class Profile extends React.Component {
     });
   };
 
-  
+  handleToggleDefault = () => {
+    const { formData } = this.state;
+    const updatedFormdata = {
+      ...formData,
+      default: !formData.default
+    };
+    this.setState({
+      formData: updatedFormdata
+    });
+  };
+
+  handleChange = e => {
+    const { formData } = this.state;
+    const updatedFormdata = {
+      ...formData,
+      [e.target.name]: e.target.value
+    }
+    this.setState({
+      formData: updatedFormdata
+    });
+  };
+
+  handleSelectChange = (e, { name, value }) => {
+    const { formData } = this.state;
+    const updatedFormdata = {
+      ...formData,
+      [name]: value
+    };
+    this.setState({
+      formData: updatedFormdata
+    });
+  };
+
+  handleCreateAddress = e => {
+    e.preventDefault();
+    const {formData} = this.state;
+    console.log(formData)
+  }
+
+
   render() {
-    const { activeItem, error, loading, addresses } = this.state
+    const { activeItem, error, loading, addresses, countries } = this.state;
 
     return (
       <Grid container columns={2} divided>
@@ -112,34 +175,41 @@ class Profile extends React.Component {
             <Divider />
             {
               activeItem === 'billingAddress' ? (
-              <Form>
+              <Form onSubmit={this.handleCreateAddress}>
                 <Form.Input
                   required
                   name="street_address"
                   placeholder="Street address"
+                  onChange={this.handleChange}
                 />
                 <Form.Input
                   required
                   name="apartment_address"
                   placeholder="Apartment address"
+                  onChange={this.handleChange}
                 />
                 <Form.Field required>
                   <Select
+                    loading={countries.length < 1 }
                     fluid
                     clearable
                     search
+                    options={countries}
                     name="country"
                     placeholder="Country"
+                    onChange={this.handleSelectChange}
                   />
                 </Form.Field>
                 <Form.Input
                   required
                   name="zip"
                   placeholder="Zip code"
+                  onChange={this.handleChange}
                 />
                 <Form.Checkbox
                   name="default"
                   label="Make this the default address?"
+                  onChange={this.handleToggleDefault}
                 />
                 <Form.Button>
                   Save
