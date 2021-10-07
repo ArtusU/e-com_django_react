@@ -25,7 +25,7 @@ class UserIDView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({'userID': request.user.id}, status=HTTP_200_OK)
 
-        
+
 class ItemListView(ListAPIView):
     permission_classes = (AllowAny, )
     serializer_class = ItemSerializer
@@ -219,9 +219,13 @@ class CountryListView(APIView):
 class AddressListView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = AddressSerializer
-    
+
     def get_queryset(self):
-        return Address.objects.filter(user=self.request.user)
+        address_type = self.request.query_params.get('address_type', None)
+        qs = Address.objects.all()
+        if address_type is None:
+            return qs
+        return qs.filter(user=self.request.user, address_type=address_type)
 
 
 class AddressCreateView(CreateAPIView):

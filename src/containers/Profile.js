@@ -50,7 +50,11 @@ class Profile extends React.Component {
     this.handleFetchUserID();
   }
 
-  handleItemClick = name => this.setState({ activeItem: name })
+  handleItemClick = name => {
+    this.setState({ activeItem: name }, () => {
+      this.handleFetchAddresses();
+    });
+  };
 
   handleFormatCountries = countries => {
     const keys = Object.keys(countries);
@@ -87,7 +91,8 @@ class Profile extends React.Component {
 
   handleFetchAddresses = () => {
     this.setState({ loading: true })
-    authAxios.get(addressListURL)
+    const { activeItem } = this.state;
+    authAxios.get(addressListURL(activeItem === "billingAddress" ? "B" : "S"))
     .then(res => {
       this.setState({ addresses: res.data, loading: false })
     })
@@ -174,11 +179,7 @@ class Profile extends React.Component {
                 <Image src="/images/wireframe/short-paragraph.png" />
               </Segment>
             )}
-            {addresses.map(a => {
-              return <div>
-                a.street_address
-              </div>
-            })}
+            
 
           </Grid.Column>
         </Grid.Row>
@@ -202,9 +203,46 @@ class Profile extends React.Component {
               />
             </Menu>
           </Grid.Column>
+          
           <Grid.Column width={10}>
             <Header>Header</Header>
             <Divider />
+            <Card.Group>
+              {addresses.map(a => {
+                console.log(a)
+                return (
+                  <Card key={a.id}>
+                    <Card.Content>
+                      {a.default && (
+                        <Label as="a" color="blue" ribbon="right">
+                          Default
+                        </Label>
+                      )}
+                      <Card.Header>
+                        {a.street_address}, {a.apartment_address}
+                      </Card.Header>
+                      <Card.Description>{a.zip}</Card.Description>
+                      <Card.Description>{a.country}</Card.Description>
+                    </Card.Content>
+                    <Card.Content extra>
+                      <Button
+                        color="yellow"
+                        onClick={() => this.handleSelectAddress(a)}
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        color="red"
+                        onClick={() => this.handleDeleteAddress(a.id)}
+                      >
+                        Delete
+                      </Button>
+                    </Card.Content>
+                  </Card>
+                );
+              })}
+            </Card.Group>
+            {addresses.length > 0 ? <Divider /> : null }
             {
               activeItem === 'billingAddress' ? (
               <Form onSubmit={this.handleCreateAddress} success={success}>
