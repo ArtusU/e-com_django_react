@@ -8,3 +8,4 @@ static
 package-lock.json
 media/
 .env
+venv
