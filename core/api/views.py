@@ -87,7 +87,8 @@ class AddToCartView(APIView):
             order = Order.objects.create(
                 user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
-            return Response(status=HTTP_200_OK)
+            
+        return Response(status=HTTP_200_OK)
 
 
 class OrderDetailView(RetrieveAPIView):

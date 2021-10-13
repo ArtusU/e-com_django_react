@@ -22,7 +22,7 @@ import {
 } from "semantic-ui-react";
 import { Link, withRouter } from "react-router-dom";
 import { authAxios } from "../utils";
-import { checkoutURL, orderSummaryURL, addCouponURL } from "../constants";
+import { checkoutURL, orderSummaryURL, addCouponURL, addressListURL } from "../constants";
 
 
 const OrderPreview = props => {
@@ -33,7 +33,6 @@ const OrderPreview = props => {
         <React.Fragment>
           <Item.Group relaxed>
           {data.order_items.map((orderItem, i) => {
-            console.log(orderItem)
             return (
               <Item key={i}>
                 <Item.Image 
@@ -118,12 +117,67 @@ class CheckoutForm extends Component {
     data: null,
     loading: false,
     error: null,
-    success: false
+    success: false,
+    billingAddresses: [],
+    shippingAddresses: [],
+    selectedBillingAddress: "",
+    selectedShippingAddress: ""
   }
 
   componentDidMount() {
     this.handleFetchOrder();
+    this.handleFetchBillingAddresses();
+    this.handleFetchShippingAddresses();
   }
+
+  handleGetDefaultAddress = addresses => {
+    const filteredAddresses = addresses.filter(el => el.default === true);
+    if (filteredAddresses.length > 0) {
+      return filteredAddresses[0].id;
+    }
+    return "";
+  };
+
+  handleFetchBillingAddresses = () => {
+    this.setState({ loading: true });
+    authAxios
+      .get(addressListURL("B"))
+      .then(res => {
+        this.setState({ billingAddresses: res.data.map(a => {
+          return {
+            key: a.id,
+            text: `${a.street_address}, ${a.apartment_address}, ${a.country}`,
+            value: a.id
+          };
+        }),
+        selectedBillingAddress: this.handleGetDefaultAddress(res.data),
+        loading: false });
+      })
+      .catch(err => { 
+        this.setState({ error: err, loading: false });
+      });
+  };
+
+  handleFetchShippingAddresses = () => {
+    this.setState({ loading: true });
+    authAxios
+      .get(addressListURL("S"))
+      .then(res => {
+        this.setState({
+          shippingAddresses: res.data.map(a => {
+            return {
+              key: a.id,
+              text: `${a.street_address}, ${a.apartment_address}, ${a.country}`,
+              value: a.id
+            };
+          }),
+          selectedShippingAddress: this.handleGetDefaultAddress(res.data),
+          loading: false });
+      })
+      .catch(err => {
+        this.setState({ error: err, loading: false });
+      });
+  };
 
   handleFetchOrder = () => {
     this.setState({ loading: true });
@@ -153,6 +207,10 @@ class CheckoutForm extends Component {
     })
   }
 
+  handleSelectChange = (e, { name, value }) => {
+    this.setState({ [name]: value });
+  };
+
   submit = ev => {
     ev.preventDefault();
     this.setState({ loading: true });
@@ -181,7 +239,9 @@ class CheckoutForm extends Component {
 
 
   render() {
-    const { data, error, loading } = this.state;
+    const { data, error, loading, billingAddresses, shippingAddresses, selectedBillingAddress, selectedShippingAddress } = this.state;
+    console.log(billingAddresses);
+    console.log(shippingAddresses);
     
     return (
       <div>
@@ -201,25 +261,64 @@ class CheckoutForm extends Component {
           </Segment>
         )}
 
-        <OrderPreview data={data} />
-
+        <OrderPreview 
+          data={data} />
         <Divider />
 
-        <CouponForm handleAddCoupon={(e, code) => this.handleAddCoupon(e, code)} />
-
+        <CouponForm 
+          handleAddCoupon={(e, code) => this.handleAddCoupon(e, code)} />
         <Divider />
 
-        <Header>Would you like to complete the purchase?</Header>
-        <CardElement />
-        <Button
-          loading={loading}
-          disabled={loading}
-          primary
-          onClick={this.submit}
-          style={{ marginTop: "20px"}}
-          >
-            Submit
-        </Button>
+        <Header>Select a billing address</Header>
+        {billingAddresses.length > 0 ? (
+          <Select
+            name="selectedBillingAddress"
+            value={selectedBillingAddress}
+            clearable
+            options={billingAddresses}
+            selection
+            onChange={this.handleSelectChange}
+          />
+        ) : (
+          <p>
+            You need to <Link to="/profile">add a billing address</Link>
+          </p>
+        )}
+
+        <Header>Select a shipping address</Header>
+        {shippingAddresses.length > 0 ? (
+          <Select
+            name="selectedShippingAddress"
+            value={selectedShippingAddress}
+            clearable
+            options={shippingAddresses}
+            selection
+            onChange={this.handleSelectChange}
+          />
+        ) : (
+          <p>
+            You need to <Link to="/profile">add a shipping address</Link>
+          </p>
+        )}
+        <Divider />
+
+        {billingAddresses.length < 1 || shippingAddresses.length < 1 ? (
+          <p>You need to <Link to="/profile">add a shipping address</Link>s before you can complete your purchase</p>
+        ) : (
+          <React.Fragment>
+            <Header>Would you like to complete the purchase?</Header>
+            <CardElement />
+            <Button
+              loading={loading}
+              disabled={loading}
+              primary
+              onClick={this.submit}
+              style={{ marginTop: "20px"}}
+              >
+                Submit
+            </Button>
+          </React.Fragment>
+        )}
       </div>
     );
   }
