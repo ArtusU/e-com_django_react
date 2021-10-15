@@ -3,7 +3,7 @@ import {
   CardElement,
   injectStripe,
   Elements,
-  StripeProvider
+  StripeProvider,
 } from "react-stripe-elements";
 import {
   Button,
@@ -18,81 +18,84 @@ import {
   Loader,
   Message,
   Segment,
-  Select
+  Select,
 } from "semantic-ui-react";
 import { Link, withRouter } from "react-router-dom";
 import { authAxios } from "../utils";
-import { checkoutURL, orderSummaryURL, addCouponURL, addressListURL } from "../constants";
+import {
+  checkoutURL,
+  orderSummaryURL,
+  addCouponURL,
+  addressListURL,
+} from "../constants";
 
+const REACT_APP_STRIPE_TEST_PUBLIC_KEY = `${process.env.REACT_APP_STRIPE_TEST_PUBLIC_KEY}`;
+// console.log(REACT_APP_STRIPE_TEST_PUBLIC_KEY);
+// console.log(process.env.REACT_APP_STRIPE_TEST_PUBLIC_KEY);
 
-const OrderPreview = props => {
+const OrderPreview = (props) => {
   const { data } = props;
   return (
     <React.Fragment>
-      { data && 
+      {data && (
         <React.Fragment>
           <Item.Group relaxed>
-          {data.order_items.map((orderItem, i) => {
-            return (
-              <Item key={i}>
-                <Item.Image 
-                size='tiny' 
-                src={`http://127.0.0.1:8000${orderItem.item.image}`}
-                />
-                <Item.Content verticalAlign='middle'>
-                  <Item.Header 
-                    as='a'
-                    >
-                    {orderItem.quantity} x {orderItem.item.title}
-                  </Item.Header>
-                  <Item.Extra>
-                    <Label>
-                      £{orderItem.final_price}
-                    </Label>
-                  </Item.Extra>
-                </Item.Content>
-              </Item>
-            )
-          })}
-          
-            
+            {data.order_items.map((orderItem, i) => {
+              return (
+                <Item key={i}>
+                  <Item.Image
+                    size="tiny"
+                    src={`http://127.0.0.1:8000${orderItem.item.image}`}
+                  />
+                  <Item.Content verticalAlign="middle">
+                    <Item.Header as="a">
+                      {orderItem.quantity} x {orderItem.item.title}
+                    </Item.Header>
+                    <Item.Extra>
+                      <Label>£{orderItem.final_price}</Label>
+                    </Item.Extra>
+                  </Item.Content>
+                </Item>
+              );
+            })}
           </Item.Group>
 
           <Item.Group>
             <Item>
               <Item.Content>
-                <Item.Header>
-                  Order Total: £{data.total}
-                </Item.Header>
-                {data.coupon && <Label color='yellow' style={{ marginLeft: '10px'}}>Current coupon: £{data.coupon.amount} OFF </Label>}
+                <Item.Header>Order Total: £{data.total}</Item.Header>
+                {data.coupon && (
+                  <Label color="yellow" style={{ marginLeft: "10px" }}>
+                    Current coupon: £{data.coupon.amount} OFF{" "}
+                  </Label>
+                )}
               </Item.Content>
             </Item>
           </Item.Group>
         </React.Fragment>
-      }
-      
+      )}
     </React.Fragment>
-  )
+  );
 };
 
 class CouponForm extends Component {
   state = {
-    code: ''
+    code: "",
   };
 
-  handleChange = e => {
+  handleChange = (e) => {
     this.setState({
-      code: e.target.value
+      code: e.target.value,
     });
   };
 
   handleSubmit = (e) => {
     const { code } = this.state;
     this.props.handleAddCoupon(e, code);
-    this.setState({code: ''});
+    this.setState({ code: "" });
   };
 
-  render () {
+  render() {
     const { code } = this.state;
     return (
       <React.Fragment>
@@ -107,7 +110,7 @@ class CouponForm extends Component {
           </Form.Field>
           <Button type="submit">Submit</Button>
         </Form>
-      </React.Fragment> 
+      </React.Fragment>
     );
   }
 }
@@ -121,8 +124,8 @@ class CheckoutForm extends Component {
     billingAddresses: [],
     shippingAddresses: [],
     selectedBillingAddress: "",
-    selectedShippingAddress: ""
-  }
+    selectedShippingAddress: "",
+  };
 
   componentDidMount() {
     this.handleFetchOrder();
@@ -130,8 +133,8 @@ class CheckoutForm extends Component {
     this.handleFetchShippingAddresses();
   }
 
-  handleGetDefaultAddress = addresses => {
-    const filteredAddresses = addresses.filter(el => el.default === true);
+  handleGetDefaultAddress = (addresses) => {
+    const filteredAddresses = addresses.filter((el) => el.default === true);
     if (filteredAddresses.length > 0) {
       return filteredAddresses[0].id;
     }
@@ -142,18 +145,20 @@ class CheckoutForm extends Component {
     this.setState({ loading: true });
     authAxios
       .get(addressListURL("B"))
-      .then(res => {
-        this.setState({ billingAddresses: res.data.map(a => {
-          return {
-            key: a.id,
-            text: `${a.street_address}, ${a.apartment_address}, ${a.country}`,
-            value: a.id
-          };
-        }),
-        selectedBillingAddress: this.handleGetDefaultAddress(res.data),
-        loading: false });
+      .then((res) => {
+        this.setState({
+          billingAddresses: res.data.map((a) => {
+            return {
+              key: a.id,
+              text: `${a.street_address}, ${a.apartment_address}, ${a.country}`,
+              value: a.id,
+            };
+          }),
+          selectedBillingAddress: this.handleGetDefaultAddress(res.data),
+          loading: false,
+        });
       })
-      .catch(err => { 
+      .catch((err) => {
         this.setState({ error: err, loading: false });
       });
   };
@@ -162,19 +167,20 @@ class CheckoutForm extends Component {
     this.setState({ loading: true });
     authAxios
       .get(addressListURL("S"))
-      .then(res => {
+      .then((res) => {
         this.setState({
-          shippingAddresses: res.data.map(a => {
+          shippingAddresses: res.data.map((a) => {
             return {
               key: a.id,
               text: `${a.street_address}, ${a.apartment_address}, ${a.country}`,
-              value: a.id
+              value: a.id,
             };
           }),
           selectedShippingAddress: this.handleGetDefaultAddress(res.data),
-          loading: false });
+          loading: false,
+        });
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({ error: err, loading: false });
       });
   };
@@ -183,10 +189,10 @@ class CheckoutForm extends Component {
     this.setState({ loading: true });
     authAxios
       .get(orderSummaryURL)
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data, loading: false });
       })
-      .catch(err => { 
+      .catch((err) => {
         if (err.response.status === 404) {
           this.props.history.push("/products");
         } else {
@@ -197,37 +203,43 @@ class CheckoutForm extends Component {
 
   handleAddCoupon = (e, code) => {
     e.preventDefault();
-    this.setState({ loading: true })
-    authAxios.post(addCouponURL, {code})
-    .then(res => {
-      this.setState({loading: false});
-      this.handleFetchOrder();
-    }).catch(err => {
-      this.setState({error: err, loading: false})
-    })
-  }
+    this.setState({ loading: true });
+    authAxios
+      .post(addCouponURL, { code })
+      .then((res) => {
+        this.setState({ loading: false });
+        this.handleFetchOrder();
+      })
+      .catch((err) => {
+        this.setState({ error: err, loading: false });
+      });
+  };
 
   handleSelectChange = (e, { name, value }) => {
     this.setState({ [name]: value });
   };
 
-  submit = ev => {
+  submit = (ev) => {
     ev.preventDefault();
     this.setState({ loading: true });
     if (this.props.stripe) {
-      this.props.stripe.createToken().then(result => {
+      this.props.stripe.createToken().then((result) => {
         if (result.error) {
           this.setState({ error: result.error.message, loading: false });
         } else {
           this.setState({ error: null });
+          const { selectedBillingAddress, selectedShippingAddress } =
+            this.state;
           authAxios
             .post(checkoutURL, {
-              stripeToken: result.token.id
+              stripeToken: result.token.id,
+              selectedBillingAddress,
+              selectedShippingAddress,
             })
-            .then(res => {
+            .then((res) => {
               this.setState({ loading: false, success: true });
             })
-            .catch(err => {
+            .catch((err) => {
               this.setState({ loading: false, error: err });
             });
         }
@@ -237,12 +249,20 @@ class CheckoutForm extends Component {
     }
   };
 
-
   render() {
-    const { data, error, loading, billingAddresses, shippingAddresses, selectedBillingAddress, selectedShippingAddress } = this.state;
+    const {
+      data,
+      error,
+      loading,
+      success,
+      billingAddresses,
+      shippingAddresses,
+      selectedBillingAddress,
+      selectedShippingAddress,
+    } = this.state;
     console.log(billingAddresses);
     console.log(shippingAddresses);
-    
+
     return (
       <div>
         {error && (
@@ -261,12 +281,12 @@ class CheckoutForm extends Component {
           </Segment>
         )}
 
-        <OrderPreview 
-          data={data} />
+        <OrderPreview data={data} />
         <Divider />
 
-        <CouponForm 
-          handleAddCoupon={(e, code) => this.handleAddCoupon(e, code)} />
+        <CouponForm
+          handleAddCoupon={(e, code) => this.handleAddCoupon(e, code)}
+        />
         <Divider />
 
         <Header>Select a billing address</Header>
@@ -303,19 +323,30 @@ class CheckoutForm extends Component {
         <Divider />
 
         {billingAddresses.length < 1 || shippingAddresses.length < 1 ? (
-          <p>You need to <Link to="/profile">add a shipping address</Link>s before you can complete your purchase</p>
+          <p>
+            You need to <Link to="/profile">add a shipping address</Link>s
+            before you can complete your purchase
+          </p>
         ) : (
           <React.Fragment>
             <Header>Would you like to complete the purchase?</Header>
             <CardElement />
+            {success && (
+              <Message positive>
+                <Message.Header>Your payment was successful</Message.Header>
+                <p>
+                  Go to your <b>profile</b> to see the order delivery status.
+                </p>
+              </Message>
+            )}
             <Button
               loading={loading}
               disabled={loading}
               primary
               onClick={this.submit}
-              style={{ marginTop: "20px"}}
-              >
-                Submit
+              style={{ marginTop: "20px" }}
+            >
+              Submit
             </Button>
           </React.Fragment>
         )}
@@ -324,17 +355,16 @@ class CheckoutForm extends Component {
   }
 }
 
-
 const InjectedForm = withRouter(injectStripe(CheckoutForm));
 
 const WrappedForm = () => (
   <Container text>
-    <StripeProvider apiKey="pk_test_51HVHJwGjLUpjNrZJDqvwOaunx2iEyXPdWmePrvoXFBbr8qDXcp9csZyVXNkxOYZCAfcDWWbFXo8QE7teREJEAaTC00yl1qLyO4">
+    <StripeProvider apiKey={REACT_APP_STRIPE_TEST_PUBLIC_KEY}>
       <div>
-          <h1>Complete your order</h1>
-          <Elements>
+        <h1>Complete your order</h1>
+        <Elements>
           <InjectedForm />
-          </Elements>
+        </Elements>
       </div>
     </StripeProvider>
   </Container>

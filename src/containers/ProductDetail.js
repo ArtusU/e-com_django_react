@@ -1,96 +1,108 @@
-import React from 'react';
+import React from "react";
 import { withRouter } from "react-router-dom";
-import axios from 'axios';
-import { connect } from 'react-redux';
+import axios from "axios";
+import { connect } from "react-redux";
 
-import { Button, Card, Dimmer, Form, Grid, Header, Container, Icon, Image, Item, Label, Loader, Message, Segment, Select, Divider } from 'semantic-ui-react'
-import { productDetailURL, addToCartURL } from '../constants'
-import { authAxios } from '../utils'
-import { fetchCart } from '../store/actions/cart'
-
+import {
+  Button,
+  Card,
+  Dimmer,
+  Form,
+  Grid,
+  Header,
+  Container,
+  Icon,
+  Image,
+  Item,
+  Label,
+  Loader,
+  Message,
+  Segment,
+  Select,
+  Divider,
+} from "semantic-ui-react";
+import { productDetailURL, addToCartURL } from "../constants";
+import { authAxios } from "../utils";
+import { fetchCart } from "../store/actions/cart";
 
 class ProductDetail extends React.Component {
-
   state = {
     loading: false,
     error: null,
     formVisible: false,
     data: [],
-    formData: {}
-  }
+    formData: {},
+  };
 
   componentDidMount() {
     this.handleFetchItem();
-    
   }
 
   handleToggleForm = () => {
-    const {formVisible} = this.state;
+    const { formVisible } = this.state;
     this.setState({
-      formVisible: !formVisible
-    })
-  }
+      formVisible: !formVisible,
+    });
+  };
 
   handleFetchItem = () => {
     const {
-      match: { params }
-
+      match: { params },
     } = this.props;
-    this.setState({loading: true});
+    this.setState({ loading: true });
     axios
-    .get(productDetailURL(params.productID))
-    .then(res => {
-      console.log(res.data)
-      this.setState({
-        data: res.data,
-        loading: false
+      .get(productDetailURL(params.productID))
+      .then((res) => {
+        console.log(res.data);
+        this.setState({
+          data: res.data,
+          loading: false,
+        });
       })
-    })
-    .catch(err => {
-      this.setState({ 
-        error: err,
-        loading: false 
-      })
-    })
-  }
+      .catch((err) => {
+        this.setState({
+          error: err,
+          loading: false,
+        });
+      });
+  };
 
-  handleFormatData = formData => {
-    return Object.keys(formData).map(key => {
+  handleFormatData = (formData) => {
+    return Object.keys(formData).map((key) => {
       return formData[key];
-    })
-  }
+    });
+  };
 
-  handleAddToCart = slug => {
-    this.setState({loading: true});
+  handleAddToCart = (slug) => {
+    this.setState({ loading: true });
     const { formData } = this.state;
     const variations = this.handleFormatData(formData);
     authAxios
-    .post(addToCartURL, { slug, variations })
-    .then(res => {
-      this.props.fetchCart();
-      this.setState({
-        loading: false
+      .post(addToCartURL, { slug, variations })
+      .then((res) => {
+        this.props.fetchCart();
+        this.setState({
+          loading: false,
+        });
       })
-    })
-    .catch(err => {
-      this.setState({ 
-        error: err,
-        loading: false 
-      })
-    })
-  }
+      .catch((err) => {
+        this.setState({
+          error: err,
+          loading: false,
+        });
+      });
+  };
 
-  handleChange = (e, {name, value}) => {
-    const {formData} = this.state;
+  handleChange = (e, { name, value }) => {
+    const { formData } = this.state;
     const updatedFormData = {
       ...formData,
-      [name]:value
+      [name]: value,
     };
-    this.setState({formData: updatedFormData})
-    console.log(name)
-    console.log(value)
-
-  }
+    this.setState({ formData: updatedFormData });
+    console.log(name);
+    console.log(value);
+  };
 
   render() {
     const { data, error, formData, formVisible, loading } = this.state;
@@ -122,6 +134,14 @@ class ProductDetail extends React.Component {
                 meta={
                   <React.Fragment>
                     {item.category}
+                    {item.discount_price ? (
+                      <Label size={"big"} color={"orange"}>
+                        £{item.discount_price}
+                      </Label>
+                    ) : (
+                      <Label>£{item.price}</Label>
+                    )}
+
                     {item.discount_price && (
                       <Label
                         color={
@@ -156,9 +176,9 @@ class ProductDetail extends React.Component {
               />
               {formVisible && (
                 <React.Fragment>
-                <Divider />
+                  <Divider />
                   <Form onSubmit={() => this.handleAddToCart(item.slug)}>
-                    {data.variations.map(v => {
+                    {data.variations.map((v) => {
                       const name = v.name.toLowerCase();
                       return (
                         <Form.Field key={v.id}>
@@ -168,11 +188,11 @@ class ProductDetail extends React.Component {
                             placeholder={`Select a ${name}`}
                             fluid
                             selection
-                            options={v.item_variations.map(item => {
+                            options={v.item_variations.map((item) => {
                               return {
                                 key: item.id,
                                 text: item.value,
-                                value: item.id
+                                value: item.id,
                               };
                             })}
                             value={formData[name]}
@@ -188,12 +208,12 @@ class ProductDetail extends React.Component {
             <Grid.Column>
               <Header as="h2">Try different variations</Header>
               {data.variations &&
-                data.variations.map(v => {
+                data.variations.map((v) => {
                   return (
                     <React.Fragment key={v.id}>
                       <Header as="h3">{v.name}</Header>
                       <Item.Group divided>
-                        {v.item_variations.map(iv => {
+                        {v.item_variations.map((iv) => {
                           return (
                             <Item key={iv.id}>
                               {iv.attachment && (
@@ -218,20 +238,12 @@ class ProductDetail extends React.Component {
       </Container>
     );
   }
-
-
 }
 
-
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    fetchCart: () => dispatch(fetchCart())
-  }
-}
+    fetchCart: () => dispatch(fetchCart()),
+  };
+};
 
-export default withRouter (
-  connect(
-    null,
-    mapDispatchToProps
-    )(ProductDetail)
-);
+export default withRouter(connect(null, mapDispatchToProps)(ProductDetail));

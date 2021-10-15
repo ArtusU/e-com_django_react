@@ -110,17 +110,28 @@ class PaymentView(APIView):
         order = Order.objects.get(user=self.request.user, ordered=False)
         userprofile = UserProfile.objects.get(user=self.request.user)
         token = request.data.get('stripeToken')
+        billing_address_id = request.data.get('selectedBillingAddress')
+        shipping_address_id = request.data.get('selectedShippingAddress')
+
+        billing_address = Address.objects.get(id=billing_address_id)
+        shipping_address = Address.objects.get(id=shipping_address_id)
 
         if userprofile.stripe_customer_id != '' and userprofile.stripe_customer_id is not None:
             customer = stripe.Customer.retrieve(
                 userprofile.stripe_customer_id)
-            #customer.sources.create(source=token)
-
+            
         else:
+            source = stripe.Source.create(
+                type='ach_credit_transfer',
+                currency='usd',
+                owner={
+                    'email': self.request.user.email
+                })
             customer = stripe.Customer.create(
                 email=self.request.user.email,
-            )
-            #customer.sources.create(source=token)
+                source=source
+                )
+
             userprofile.stripe_customer_id = customer['id']
             userprofile.one_click_purchasing = True
             userprofile.save()
@@ -129,7 +140,7 @@ class PaymentView(APIView):
 
         try:
 
-                # charge the customer because we cannot charge the token more than once
+            #charge the customer because we cannot charge the token more than once
             charge = stripe.PaymentIntent.create(
                 amount=amount,  # cents
                 currency="usd",
@@ -150,7 +161,6 @@ class PaymentView(APIView):
             payment.save()
 
             # assign the payment to the order
-
             order_items = order.items.all()
             order_items.update(ordered=True)
             for item in order_items:
@@ -158,6 +168,8 @@ class PaymentView(APIView):
 
             order.ordered = True
             order.payment = payment
+            order.billing_address = billing_address
+            order.shipping_address = shipping_address
             # order.ref_code = create_ref_code()
             order.save()
 
