@@ -22,6 +22,7 @@ import {
   addressListURL,
   addressCreateURL,
   addressUpdateURL,
+  addressDeleteURL,
   countryListURL,
   userIDURL,
 } from "../constants";
@@ -282,6 +283,17 @@ class Profile extends React.Component {
         value: k,
       };
     });
+  };
+
+  handleDeleteAddress = addressID => {
+    authAxios
+      .delete(addressDeleteURL(addressID))
+      .then(res => {
+        this.handleCallback();
+      })
+      .catch(err => {
+        this.setState({ error: err });
+      });
   };
 
   handleSelectAddress = (address) => {
