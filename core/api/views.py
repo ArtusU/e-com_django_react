@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from django_countries import countries
 
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, get_object_or_404
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, get_object_or_404, UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -247,3 +247,7 @@ class AddressCreateView(CreateAPIView):
     queryset = Address.objects.all()
 
 
+class AddressUpdateView(UpdateAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = AddressSerializer
+    queryset = Address.objects.all()

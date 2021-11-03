@@ -21,6 +21,7 @@ import {
 import {
   addressListURL,
   addressCreateURL,
+  addressUpdateURL,
   countryListURL,
   userIDURL,
 } from "../constants";
@@ -152,6 +153,28 @@ class AddressForm extends React.Component {
         this.props.callback();
       })
       .catch((err) => {
+        this.setState({ error: err });
+      });
+  };
+
+  handleUpdateAddress = () => {
+    const { userID, activeItem } = this.props;
+    const { formData } = this.state;
+    authAxios
+      .put(addressUpdateURL(formData.id), {
+        ...formData,
+        user: userID,
+        address_type: activeItem === "billingAddress" ? "B" : "S"
+      })
+      .then(res => {
+        this.setState({
+          saving: false,
+          success: true,
+          formData: { default: false }
+        });
+        this.props.callback();
+      })
+      .catch(err => {
         this.setState({ error: err });
       });
   };
