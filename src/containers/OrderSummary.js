@@ -1,64 +1,84 @@
-import React from 'react';
-import { Button, Container, Header, Icon, Label, Menu, Table, Message, Segment, Dimmer, Loader, Image } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
-import { authAxios } from '../utils';
+import React from "react";
 import {
-  orderSummaryURL
-} from '../constants';
-
+  Button,
+  Container,
+  Header,
+  Icon,
+  Label,
+  Menu,
+  Table,
+  Message,
+  Segment,
+  Dimmer,
+  Loader,
+  Image,
+} from "semantic-ui-react";
+import { Link } from "react-router-dom";
+import { authAxios } from "../utils";
+import { orderSummaryURL, orderItemDeleteURL } from "../constants";
 
 class OrderSummary extends React.Component {
   state = {
     data: null,
     error: null,
-    lading: false
+    lading: false,
   };
 
   componentDidMount() {
-    this.handleFetchOrder()
+    this.handleFetchOrder();
   }
 
   handleFetchOrder = () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     authAxios
-    .get(orderSummaryURL)
-    .then(res => {
-      this.setState({
-        data: res.data,
-        loading: false
+      .get(orderSummaryURL)
+      .then((res) => {
+        this.setState({
+          data: res.data,
+          loading: false,
+        });
+      })
+      .catch((err) => {
+        if (err.response.status === 404) {
+          this.setState({
+            error: "You currently do not have an order.",
+            loading: false,
+          });
+        } else {
+          this.setState({
+            error: err,
+            loading: false,
+          });
+        }
       });
-    })
-    .catch(err => {
-      if (err.response.status === 404) {
-        this.setState({
-          error: "You currently do not have an order.",
-          loading: false
-        });
-      } else {
-        this.setState({
-          error: err,
-          loading: false
-        });
-      }
-    });
   };
 
-  renderVariations = orderItem => {
+  renderVariations = (orderItem) => {
     let text = "";
-    orderItem.item_variations.forEach(iv => {
+    orderItem.item_variations.forEach((iv) => {
       text += `${iv.variation.name}: ${iv.value}, `;
     });
     return text;
   };
 
+  handleRemoveItem = (itemID) => {
+    authAxios
+      .delete(orderItemDeleteURL(itemID))
+      .then((res) => {
+        this.handleFetchOrder();
+      })
+      .catch((err) => {
+        this.setState({ error: err });
+      });
+  };
 
   render() {
     const { data, error, loading } = this.state;
     return (
       <Container>
-        <Header as='h3'>Order Summary</Header>
+        <Header as="h3">Order Summary</Header>
         {error && (
           <Message
             error
@@ -91,15 +111,13 @@ class OrderSummary extends React.Component {
               {data.order_items.map((orderItem, i) => {
                 return (
                   <Table.Row key={orderItem.id}>
-                    <Table.Cell>
-                      {i + 1}
-                    </Table.Cell>
+                    <Table.Cell>{i + 1}</Table.Cell>
                     <Table.Cell>
                       {orderItem.item.title} -{" "}
                       {this.renderVariations(orderItem)}
                     </Table.Cell>
                     <Table.Cell>£{orderItem.item.price}</Table.Cell>
-                    <Table.Cell>{ orderItem.quantity }</Table.Cell>
+                    <Table.Cell>{orderItem.quantity}</Table.Cell>
                     <Table.Cell>
                       {orderItem.item.discount_price && (
                         <Label color="green" ribbon>
@@ -111,10 +129,11 @@ class OrderSummary extends React.Component {
                         name="trash"
                         color="red"
                         style={{ float: "right", cursor: "pointer" }}
+                        onClick={() => this.handleRemoveItem(orderItem.id)}
                       />
                     </Table.Cell>
                   </Table.Row>
-                )
+                );
               })}
               <Table.Row>
                 <Table.Cell />
@@ -124,22 +143,21 @@ class OrderSummary extends React.Component {
                   Order Total: £{data.total}
                 </Table.Cell>
               </Table.Row>
-            
             </Table.Body>
 
             <Table.Footer>
-            <Table.Row>
-                <Table.HeaderCell colSpan='5' textAlign='right'>
-                <Link to='/checkout'><Button color='yellow'>
-                  Checkout
-                  </Button></Link>
+              <Table.Row>
+                <Table.HeaderCell colSpan="5" textAlign="right">
+                  <Link to="/checkout">
+                    <Button color="yellow">Checkout</Button>
+                  </Link>
                 </Table.HeaderCell>
-            </Table.Row>
+              </Table.Row>
             </Table.Footer>
           </Table>
         )}
       </Container>
-    )
+    );
   }
 }
 

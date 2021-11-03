@@ -12,6 +12,7 @@ from .views import (
     AddressCreateView,
     AddressUpdateView,
     AddressDeleteView,
+    OrderItemDeleteView
 )
 
 
@@ -28,4 +29,5 @@ urlpatterns = [
     path('order-summary/', OrderDetailView.as_view(), name='order-summary'),
     path('checkout/', PaymentView.as_view(), name='checkout'),
     path('add-coupon/', AddCouponView.as_view(), name='add-coupon'),
+    path('order-items/<pk>/delete/', OrderItemDeleteView.as_view(), name='order-item-delete'),
 ]

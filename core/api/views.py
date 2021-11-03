@@ -38,6 +38,11 @@ class ItemDetailView(RetrieveAPIView):
     queryset = Item.objects.all()
 
 
+class OrderItemDeleteView(DestroyAPIView):
+    permission_classes = (IsAuthenticated, )
+    queryset = OrderItem.objects.all()
+
+
 class AddToCartView(APIView):
     def post(self, request, *args, **kwargs):
         slug = request.data.get('slug', None)

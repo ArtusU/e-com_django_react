@@ -17,3 +17,5 @@ export const addressUpdateURL = (id) => `${endpoint}/addresses/${id}/update/`;
 export const addressDeleteURL = (id) => `${endpoint}/addresses/${id}/delete/`;
 export const countryListURL = `${endpoint}/countries`;
 export const userIDURL = `${endpoint}/user-id`;
+export const orderItemDeleteURL = (id) =>
+  `${endpoint}/order-items/${id}/delete/`;
