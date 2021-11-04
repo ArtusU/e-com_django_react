@@ -15,7 +15,11 @@ import {
 } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import { authAxios } from "../utils";
-import { orderSummaryURL, orderItemDeleteURL } from "../constants";
+import {
+  orderSummaryURL,
+  orderItemDeleteURL,
+  addToCartURL,
+} from "../constants";
 
 class OrderSummary extends React.Component {
   state = {
@@ -61,6 +65,27 @@ class OrderSummary extends React.Component {
       text += `${iv.variation.name}: ${iv.value}, `;
     });
     return text;
+  };
+
+  handleFormatData = (itemVariations) => {
+    // convert [{id: 1},{id: 2}] to [1,2] - they're all variations
+    return Object.keys(itemVariations).map((key) => {
+      return itemVariations[key].id;
+    });
+  };
+
+  handleAddToCart = (slug, itemVariations) => {
+    this.setState({ loading: true });
+    const variations = this.handleFormatData(itemVariations);
+    authAxios
+      .post(addToCartURL, { slug, variations })
+      .then((res) => {
+        this.handleFetchOrder();
+        this.setState({ loading: false });
+      })
+      .catch((err) => {
+        this.setState({ error: err, loading: false });
+      });
   };
 
   handleRemoveItem = (itemID) => {
@@ -116,15 +141,34 @@ class OrderSummary extends React.Component {
                       {orderItem.item.title} -{" "}
                       {this.renderVariations(orderItem)}
                     </Table.Cell>
-                    <Table.Cell>£{orderItem.item.price}</Table.Cell>
-                    <Table.Cell>{orderItem.quantity}</Table.Cell>
+                    <Table.Cell>${orderItem.item.price}</Table.Cell>
+                    <Table.Cell textAlign="center">
+                      <Icon
+                        name="minus"
+                        style={{ float: "left", cursor: "pointer" }}
+                        onClick={() =>
+                          this.handleRemoveQuantityFromCart(orderItem.item.slug)
+                        }
+                      />
+                      {orderItem.quantity}
+                      <Icon
+                        name="plus"
+                        style={{ float: "right", cursor: "pointer" }}
+                        onClick={() =>
+                          this.handleAddToCart(
+                            orderItem.item.slug,
+                            orderItem.item_variations
+                          )
+                        }
+                      />
+                    </Table.Cell>
                     <Table.Cell>
                       {orderItem.item.discount_price && (
                         <Label color="green" ribbon>
                           ON DISCOUNT
                         </Label>
                       )}
-                      £{orderItem.final_price}
+                      ${orderItem.final_price}
                       <Icon
                         name="trash"
                         color="red"
@@ -140,7 +184,7 @@ class OrderSummary extends React.Component {
                 <Table.Cell />
                 <Table.Cell />
                 <Table.Cell textAlign="right" colSpan="2">
-                  Order Total: £{data.total}
+                  Order Total: ${data.total}
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
