@@ -1,31 +1,32 @@
 import React from "react";
 import {
-  Button,
   Container,
+  Dimmer,
   Header,
   Icon,
+  Image,
   Label,
-  Menu,
+  Loader,
   Table,
+  Button,
   Message,
   Segment,
-  Dimmer,
-  Loader,
-  Image,
 } from "semantic-ui-react";
-import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { Link, Redirect } from "react-router-dom";
 import { authAxios } from "../utils";
 import {
+  addToCartURL,
   orderSummaryURL,
   orderItemDeleteURL,
-  addToCartURL,
+  orderItemUpdateQuantityURL,
 } from "../constants";
 
 class OrderSummary extends React.Component {
   state = {
     data: null,
     error: null,
-    lading: false,
+    loading: false,
   };
 
   componentDidMount() {
@@ -33,28 +34,20 @@ class OrderSummary extends React.Component {
   }
 
   handleFetchOrder = () => {
-    this.setState({
-      loading: true,
-    });
+    this.setState({ loading: true });
     authAxios
       .get(orderSummaryURL)
       .then((res) => {
-        this.setState({
-          data: res.data,
-          loading: false,
-        });
+        this.setState({ data: res.data, loading: false });
       })
       .catch((err) => {
         if (err.response.status === 404) {
           this.setState({
-            error: "You currently do not have an order.",
+            error: "You currently do not have an order",
             loading: false,
           });
         } else {
-          this.setState({
-            error: err,
-            loading: false,
-          });
+          this.setState({ error: err, loading: false });
         }
       });
   };
@@ -88,6 +81,17 @@ class OrderSummary extends React.Component {
       });
   };
 
+  handleRemoveQuantityFromCart = (slug) => {
+    authAxios
+      .post(orderItemUpdateQuantityURL, { slug })
+      .then((res) => {
+        this.handleFetchOrder();
+      })
+      .catch((err) => {
+        this.setState({ error: err });
+      });
+  };
+
   handleRemoveItem = (itemID) => {
     authAxios
       .delete(orderItemDeleteURL(itemID))
@@ -101,9 +105,14 @@ class OrderSummary extends React.Component {
 
   render() {
     const { data, error, loading } = this.state;
+    const { isAuthenticated } = this.props;
+    if (!isAuthenticated) {
+      return <Redirect to="/login" />;
+    }
+
     return (
       <Container>
-        <Header as="h3">Order Summary</Header>
+        <Header>Order Summary</Header>
         {error && (
           <Message
             error
@@ -191,9 +200,11 @@ class OrderSummary extends React.Component {
 
             <Table.Footer>
               <Table.Row>
-                <Table.HeaderCell colSpan="5" textAlign="right">
+                <Table.HeaderCell colSpan="5">
                   <Link to="/checkout">
-                    <Button color="yellow">Checkout</Button>
+                    <Button floated="right" color="yellow">
+                      Checkout
+                    </Button>
                   </Link>
                 </Table.HeaderCell>
               </Table.Row>
@@ -205,4 +216,10 @@ class OrderSummary extends React.Component {
   }
 }
 
-export default OrderSummary;
+const mapStateToProps = (state) => {
+  return {
+    isAuthenticated: state.auth.token !== null,
+  };
+};
+
+export default connect(mapStateToProps)(OrderSummary);
