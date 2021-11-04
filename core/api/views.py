@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from core.models import Address, Item, Order, OrderItem, Payment, UserProfile, Coupon, Variation
-from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer, AddressSerializer
+from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer, AddressSerializer, PaymentSerializer
 
 import stripe
 
@@ -292,3 +292,11 @@ class AddressUpdateView(UpdateAPIView):
 class AddressDeleteView(DestroyAPIView):
     permission_classes = (IsAuthenticated, )
     queryset = Address.objects.all()
+
+
+class PaymentListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PaymentSerializer
+
+    def get_queryset(self):
+        return Payment.objects.filter(user=self.request.user)

@@ -25,6 +25,7 @@ import {
   addressDeleteURL,
   countryListURL,
   userIDURL,
+  paymentListURL,
 } from "../constants";
 import { authAxios } from "../utils";
 
@@ -39,6 +40,21 @@ class PaymentHistory extends React.Component {
   componentDidMount() {
     this.handleFetchPayments();
   }
+
+  handleFetchPayments = () => {
+    this.setState({ loading: true });
+    authAxios
+      .get(paymentListURL)
+      .then((res) => {
+        this.setState({
+          loading: false,
+          payments: res.data,
+        });
+      })
+      .catch((err) => {
+        this.setState({ error: err, loading: false });
+      });
+  };
 
   render() {
     const { payments } = this.state;
@@ -165,17 +181,17 @@ class AddressForm extends React.Component {
       .put(addressUpdateURL(formData.id), {
         ...formData,
         user: userID,
-        address_type: activeItem === "billingAddress" ? "B" : "S"
+        address_type: activeItem === "billingAddress" ? "B" : "S",
       })
-      .then(res => {
+      .then((res) => {
         this.setState({
           saving: false,
           success: true,
-          formData: { default: false }
+          formData: { default: false },
         });
         this.props.callback();
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({ error: err });
       });
   };
@@ -285,13 +301,13 @@ class Profile extends React.Component {
     });
   };
 
-  handleDeleteAddress = addressID => {
+  handleDeleteAddress = (addressID) => {
     authAxios
       .delete(addressDeleteURL(addressID))
-      .then(res => {
+      .then((res) => {
         this.handleCallback();
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({ error: err });
       });
   };

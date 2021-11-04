@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from core import models
-from core.models import Address, Item, ItemVariation, Order, OrderItem, Coupon, Variation
+from core.models import Address, Item, ItemVariation, Order, OrderItem, Coupon, Variation, Payment
 
 
 class StringSerializer(serializers.StringRelatedField):
@@ -199,4 +199,14 @@ class AddressSerializer(serializers.ModelSerializer):
             'zip',
             'address_type',
             'default'
+        )
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = (
+            'id',
+            'amount',
+            'timestamp'
         )
